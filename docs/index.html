@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Object Detection | O.D.S.</title>
+    <!-- Import TensorFlow.js and COCO-SSD Model -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #050505;
+            --text-color: #e0e0e0;
+            --accent-color: #00f3ff;
+            --accent-glow: rgba(0, 243, 255, 0.5);
+            --secondary-color: #ff0055;
+            --card-bg: rgba(20, 20, 20, 0.8);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Roboto', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-image:
+                radial-gradient(circle at 50% 50%, rgba(0, 243, 255, 0.05) 0%, transparent 50%),
+                linear-gradient(0deg, rgba(0, 0, 0, 1) 0%, rgba(10, 10, 10, 1) 100%);
+            overflow: hidden;
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            color: var(--accent-color);
+            text-shadow: 0 0 20px var(--accent-glow);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .video-container {
+            position: relative;
+            width: 640px;
+            height: 480px;
+            border: 2px solid var(--accent-color);
+            box-shadow: 0 0 30px rgba(0, 243, 255, 0.2);
+            border-radius: 10px;
+            background: #000;
+            overflow: hidden;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 10;
+        }
+
+        .status {
+            margin-top: 20px;
+            font-family: 'Orbitron', monospace;
+            color: #00ff66;
+            font-size: 1.2rem;
+        }
+
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--accent-color);
+            font-family: 'Orbitron';
+            font-size: 1.5rem;
+            text-align: center;
+        }
+
+        .footer {
+            margin-top: 30px;
+            font-size: 0.8rem;
+            color: #555;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Object Detection System</h1>
+
+    <div class="video-container">
+        <div id="loading" class="loading">LOADING NEURAL NET...</div>
+        <video id="video" autoplay playsinline muted></video>
+        <canvas id="canvas"></canvas>
+    </div>
+
+    <div class="status" id="status">INITIALIZING...</div>
+
+    <div class="footer">
+        Powered by TensorFlow.js & COCO-SSD
+    </div>
+
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const statusText = document.getElementById('status');
+        const loadingText = document.getElementById('loading');
+        let model = undefined;
+
+        // Load Model
+        cocoSsd.load().then(loadedModel => {
+            model = loadedModel;
+            loadingText.style.display = 'none';
+            statusText.innerText = "SYSTEM READY - STARTING CAMERA";
+            startVideo();
+        });
+
+        // Start Webcam
+        function startVideo() {
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(stream => {
+                    video.srcObject = stream;
+                    video.onloadeddata = () => {
+                        canvas.width = video.clientWidth;
+                        canvas.height = video.clientHeight;
+                        statusText.innerText = "ACTIVE: SCANNING...";
+                        predictWebcam();
+                    };
+                })
+                .catch(err => {
+                    statusText.innerText = "ERROR: CAMERA ACCESS DENIED";
+                    statusText.style.color = "red";
+                    console.error(err);
+                });
+        }
+
+        // Prediction Loop
+        function predictWebcam() {
+            if (!model) return;
+
+            model.detect(video).then(predictions => {
+                renderPredictions(predictions);
+                requestAnimationFrame(predictWebcam);
+            });
+        }
+
+        // Draw Bounding Boxes
+        function renderPredictions(predictions) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const font = "16px 'Orbitron'";
+            ctx.font = font;
+            ctx.textBaseline = "top";
+
+            predictions.forEach(prediction => {
+                const x = prediction.bbox[0];
+                const y = prediction.bbox[1];
+                const width = prediction.bbox[2];
+                const height = prediction.bbox[3];
+                const label = prediction.class.toUpperCase();
+                const score = Math.round(prediction.score * 100) + '%';
+
+                // Box
+                ctx.strokeStyle = "#00f3ff";
+                ctx.lineWidth = 2;
+                ctx.strokeRect(x, y, width, height);
+
+                // Label Background
+                const textWidth = ctx.measureText(label + " " + score).width;
+                ctx.fillStyle = "rgba(0, 243, 255, 0.8)";
+                ctx.fillRect(x, y, textWidth + 10, 25);
+
+                // Text
+                ctx.fillStyle = "#000000";
+                ctx.fillText(label + " " + score, x + 5, y + 5);
+            });
+        }
+    </script>
+</body>
+
+</html>
