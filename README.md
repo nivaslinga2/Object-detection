@@ -1,4 +1,6 @@
 # Object detection using deep learning with OpenCV and Python 
+ 
+ [**🔴 Live Demo (Resume Link)**](https://nivaslinga2.github.io/Object-detection/) 
 
 OpenCV `dnn` module supports running inference on pre-trained deep learning models from popular frameworks like Caffe, Torch and TensorFlow. 
 
