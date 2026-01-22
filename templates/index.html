@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Object Detection System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 class="glitch" data-text="O.D.S.">Object Detection System</h1>
+            <p class="subtitle">Advanced Real-Time Computer Vision</p>
+        </header>
+        
+        <main>
+            <div class="card">
+                <div class="scanner"></div>
+                <h2>System Status: <span class="status-ready">ONLINE</span></h2>
+                <p>Initialize the neural network interface to begin real-time object analysis.</p>
+                <a href="/monitor" class="btn-start">
+                    <span class="btn-content">INITIALIZE DETECTION</span>
+                    <div class="btn-glitch"></div>
+                </a>
+            </div>
+        </main>
+        
+        <footer>
+            <p>System v2.0 | Powered by OpenCV & YOLO</p>
+        </footer>
+    </div>
+</body>
+</html>

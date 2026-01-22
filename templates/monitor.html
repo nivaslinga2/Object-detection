@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Detection | O.D.S.</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <div class="monitor-container">
+        <header style="margin-bottom: 1rem;">
+            <h2 style="font-family: 'Orbitron'; color: var(--accent-color);">LIVE FEED ANALYSIS</h2>
+        </header>
+
+        <img src="{{ url_for('video_feed') }}" class="video-feed" alt="Video Feed">
+
+        <a href="/" class="btn-start btn-back">
+            <span class="btn-content">TERMINATE SESSION</span>
+        </a>
+    </div>
+</body>
+
+</html>
